@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tesla Authorization</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; max-width: 640px; margin: 48px auto; padding: 0 20px; color: #222; }
+  h1 { font-size: 22px; }
+  code { display: block; background: #f4f4f4; border: 1px solid #ddd; border-radius: 8px; padding: 16px; word-break: break-all; font-size: 15px; margin: 16px 0; }
+  button { font-size: 16px; padding: 10px 18px; border-radius: 8px; border: 1px solid #222; background: #222; color: #fff; cursor: pointer; }
+  .error { color: #b00020; }
+  p { line-height: 1.5; }
+</style>
+</head>
+<body>
+<h1>Tesla Authorization</h1>
+<div id="out"><p>Waiting for Tesla to redirect back with a code…</p></div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const out = document.getElementById('out');
+  const code = params.get('code');
+  const error = params.get('error');
+  if (code) {
+    out.innerHTML = '<p>Got it. Copy this authorization code and send it to Baxter:</p>'
+      + '<code id="code">' + code.replace(/</g, '&lt;') + '</code>'
+      + '<button id="copy">Copy code</button>'
+      + '<p id="copied"></p>';
+    document.getElementById('copy').onclick = function () {
+      navigator.clipboard.writeText(code).then(function () {
+        document.getElementById('copied').textContent = 'Copied.';
+      });
+    };
+  } else if (error) {
+    out.innerHTML = '<p class="error">Tesla returned an error: '
+      + error.replace(/</g, '&lt;')
+      + (params.get('error_description') ? ' — ' + params.get('error_description').replace(/</g, '&lt;') : '')
+      + '</p>';
+  } else {
+    out.innerHTML = '<p>No authorization code in this URL. This page only shows a code after you sign in on Tesla and get sent back here.</p>';
+  }
+</script>
+</body>
+</html>
